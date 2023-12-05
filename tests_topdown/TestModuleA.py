@@ -36,6 +36,7 @@ class TestModuleA(unittest.TestCase):
         self.assertEqual(returnVal, True)
 
     def test_parse_delete_fail(self):
+        self.moduleA._data = None
         self.mockD.deleteData.return_value = None
 
         returnVal = self.moduleA.parseDelete(1)
