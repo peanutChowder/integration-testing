@@ -53,8 +53,8 @@ class TestModuleABCDE(unittest.TestCase):
     def test_parse_delete_fail(self):
         returnVal = self.moduleA.parseDelete(0)
 
-        self.mockF.displayData.assert_called_once_with([])
-        self.mockG.updateData.assert_called_once_with(self.initialFile, [])
+        self.mockF.displayData.assert_called_once_with([Entry("data1", "1")])
+        self.mockG.updateData.assert_called_once_with(self.initialFile, [Entry("data1", "1")])
 
         self.assertEqual(returnVal, False)
 
