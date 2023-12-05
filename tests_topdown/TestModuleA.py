@@ -197,11 +197,18 @@ class TestModuleA(unittest.TestCase):
         mockPrint.assert_called_with('Malformed command!')
 
     @patch('builtins.print')
-    @patch('modules.ModuleA.ModuleA.parseLoad')
-    def test_run_load(self, mockParseLoad, print):
+    def test_run_load(self, print):
+        fileData = [
+            Entry("data1", "2"),
+            Entry("data2", "4")
+        ]
+
+        self.mockB.loadFile.return_value = fileData.copy()
+
         self.moduleA.run('load', 'file.txt')
 
-        mockParseLoad.assert_called_once_with('file.txt')
+        self.mockB.loadFile.assert_called_once_with("file.txt")
+        self.assertEqual(self.moduleA._data, fileData)
 
     @patch('builtins.print')
     def test_run_add_no_args(self, mockPrint):
