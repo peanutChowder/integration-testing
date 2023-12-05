@@ -281,11 +281,10 @@ class TestModuleA(unittest.TestCase):
         self.mockD.deleteData.assert_called_once_with(self.initialData, 1, self.initialFile)
 
     @patch('builtins.print')
-    @patch('modules.ModuleA.ModuleA.runExit')
-    def test_run_runexit(self, mockRunExit, mockPrint):
+    def test_run_runexit(self, mockPrint):
         self.moduleA.run('exit')
 
-        mockRunExit.assert_called_once()
+        self.mockE.exitProgram.assert_called_once_with()
 
     @patch('builtins.print')
     def test_run_unknown(self, mockPrint):
