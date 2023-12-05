@@ -223,11 +223,10 @@ class TestModuleA(unittest.TestCase):
         mockPrint.assert_called_with("No file loaded!")
 
     @patch('builtins.print')
-    @patch('modules.ModuleA.ModuleA.parseAdd')
-    def test_run_add(self, mockParseAdd, mockPrint):
+    def test_run_add(self, mockPrint):
         self.moduleA.run('add', 'data23', '23')
 
-        mockParseAdd.assert_called_once_with('data23', '23')
+        self.mockD.insertData.assert_called_once_with(self.initialData, "data23", "23", self.initialFile)
 
     @patch('builtins.print')
     def test_run_sort_no_data(self, mockPrint):
@@ -238,11 +237,10 @@ class TestModuleA(unittest.TestCase):
         mockPrint.assert_called_with('No file loaded!')
 
     @patch('builtins.print')
-    @patch('modules.ModuleA.ModuleA.runSort')
-    def test_run_sort(self, mockRunSort, mockPrint):
+    def test_run_sort(self, mockPrint):
         self.moduleA.run('sort')
 
-        mockRunSort.assert_called_once()
+        self.mockC.sortData.assert_called_once_with(self.initialData)
 
     @patch('builtins.print')
     def test_run_update_no_args(self, mockPrint):
@@ -253,16 +251,15 @@ class TestModuleA(unittest.TestCase):
     @patch('builtins.print')
     def test_run_update_no_data(self, mockPrint):
         self.moduleA._data = None
-        self.moduleA.run('update', 3, "data33", "33")
+        self.moduleA.run('update', 1, 'data33', '33')
 
         mockPrint.assert_called_with("No file loaded!")
 
     @patch('builtins.print')
-    @patch('modules.ModuleA.ModuleA.parseUpdate')
-    def test_run_update(self, mockParseUpdate, mockPrint):
-        self.moduleA.run('update', 3, 'data33', '33')
+    def test_run_update(self, mockPrint):
+        self.moduleA.run('update', 1, 'data33', '33')
 
-        mockParseUpdate.assert_called_once_with( 3, 'data33', '33')
+        self.mockD.updateData.assert_called_once_with(self.initialData, 1, "data33", "33", self.initialFile)
     
     @patch('builtins.print')
     def test_run_delete_no_args(self, mockPrint):
@@ -279,7 +276,7 @@ class TestModuleA(unittest.TestCase):
 
     @patch('builtins.print')
     @patch('modules.ModuleA.ModuleA.parseDelete')
-    def test_run_update(self, mockParseDelete, mockPrint):
+    def test_run_delete(self, mockParseDelete, mockPrint):
         self.moduleA.run('delete', 3)
 
         mockParseDelete.assert_called_once_with(3)
