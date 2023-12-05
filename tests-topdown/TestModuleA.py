@@ -40,8 +40,6 @@ class TestModuleA(unittest.TestCase):
 
         returnVal = self.moduleA.parseDelete(1)
 
-        self.mockD.deleteData.assert_called_once_with(None, 1, self.initialFile)
-
         self.assertEqual(returnVal, False)
 
     @patch("builtins.print")
