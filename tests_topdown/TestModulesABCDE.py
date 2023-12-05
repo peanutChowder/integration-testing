@@ -287,7 +287,7 @@ class TestModuleABCDE(unittest.TestCase):
 
         self.moduleA.run('sort')
 
-        self.assertEquals(self.moduleA._data, finalData)
+        self.assertEqual(self.moduleA._data, finalData)
         self.mockF.displayData(finalData)
 
         
