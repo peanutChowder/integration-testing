@@ -333,25 +333,29 @@ class TestModuleABCDE(unittest.TestCase):
 
         mockPrint.assert_called_with("No file loaded!")
 
-#     @patch('builtins.print')
-#     @patch('modules.ModuleA.ModuleA.parseDelete')
-#     def test_run_update(self, mockParseDelete, mockPrint):
-#         self.moduleA.run('delete', 3)
+    @patch('builtins.print')
+    def test_run_update(self, mockPrint):
+        finalData = [Entry("data1", "1")]
 
-#         mockParseDelete.assert_called_once_with(3)
+        self.moduleA.run('delete', 1)
 
-#     @patch('builtins.print')
-#     @patch('modules.ModuleA.ModuleA.runExit')
-#     def test_run_runexit(self, mockRunExit, mockPrint):
-#         self.moduleA.run('exit')
+        self.assertEquals(self.moduleA._data, finalData)
+        self.mockF.displayData.assert_called_once_with(finalData)
+        self.mockG.updateData.assert_called_once_with(self.initialFile, finalData)
 
-#         mockRunExit.assert_called_once()
+    @patch('builtins.print')
+    @patch("builtins.exit")
+    def test_run_runexit(self, mockExit, mockPrint):
+        self.moduleA.run('exit')
 
-#     @patch('builtins.print')
-#     def test_run_unknown(self, mockPrint):
-#         self.moduleA.run('asdfsadf')
+        mockPrint.assert_called_once_with("Program Exit !")
+        mockExit.assert_called_once_with()
 
-#         mockPrint.assert_called_with("Unknown command, type 'help' for command list.")
+    @patch('builtins.print')
+    def test_run_unknown(self, mockPrint):
+        self.moduleA.run('asdfsadf')
+
+        mockPrint.assert_called_with("Unknown command, type 'help' for command list.")
 
 # if __name__ == '__main__':
 #     unittest.main()
