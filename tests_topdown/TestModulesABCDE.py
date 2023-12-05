@@ -330,7 +330,7 @@ class TestModuleABCDE(unittest.TestCase):
         mockPrint.assert_called_with("No file loaded!")
 
     @patch('builtins.print')
-    def test_run_update(self, mockPrint):
+    def test_run_delete(self, mockPrint):
         finalData = [Entry("data1", "1")]
 
         self.moduleA.run('delete', 1)
