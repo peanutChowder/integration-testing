@@ -270,16 +270,15 @@ class TestModuleA(unittest.TestCase):
     @patch('builtins.print')
     def test_run_delete_no_data(self, mockPrint):
         self.moduleA._data = None
-        self.moduleA.run('delete', 3)
+        self.moduleA.run('delete', 1)
 
         mockPrint.assert_called_with("No file loaded!")
 
     @patch('builtins.print')
-    @patch('modules.ModuleA.ModuleA.parseDelete')
-    def test_run_delete(self, mockParseDelete, mockPrint):
-        self.moduleA.run('delete', 3)
+    def test_run_delete(self, mockPrint):
+        self.moduleA.run('delete', 1)
 
-        mockParseDelete.assert_called_once_with(3)
+        self.mockD.deleteData.assert_called_once_with(self.initialData, 1, self.initialFile)
 
     @patch('builtins.print')
     @patch('modules.ModuleA.ModuleA.runExit')
