@@ -50,12 +50,10 @@ class TestModuleABCDE(unittest.TestCase):
 
         self.assertEqual(returnVal, True)
 
-    def test_parse_delete_fail(self):
+    def test_parse_no_data(self):
+        self.moduleA._data = None
         returnVal = self.moduleA.parseDelete(0)
-
-        self.mockF.displayData.assert_called_once_with([Entry("data1", "1")])
-        self.mockG.updateData.assert_called_once_with(self.initialFile, [Entry("data1", "1")])
-
+        
         self.assertEqual(returnVal, False)
 
     @patch("builtins.print")
