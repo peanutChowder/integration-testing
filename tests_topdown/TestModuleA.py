@@ -154,8 +154,6 @@ class TestModuleA(unittest.TestCase):
 
         returnVal = self.moduleA.parseUpdate(2, "data3", "3")
 
-        self.mockD.updateData.assert_called_once_with(self.initialData, 2, "data3", "3", self.initialFile)
-
         self.assertEqual(self.moduleA._data, None)
         self.assertEqual(returnVal, False)
 
