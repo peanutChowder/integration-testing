@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock, MagicMock, patch, mock_open
+from unittest.mock import Mock, MagicMock, patch, mock_open, call
 
 from modules.ModuleA import ModuleA
 from modules.ModuleB import ModuleB
@@ -94,206 +94,244 @@ class TestModuleABCDE(unittest.TestCase):
         self.assertEqual(self.moduleA._data, fileData)
         self.assertEqual(returnVal, True)
 
-#     def test_parse_load_fail(self):
-#         self.mockB.loadFile.return_value = None
+    @patch("builtins.open", side_effect=IOError())
+    def test_parse_load_fail(self, mockOpen):
+        self.moduleA._data = []
+        returnVal = self.moduleA.parseLoad("file.txt")
 
-#         returnVal = self.moduleA.parseLoad("file.txt")
+        mockOpen.assert_called_with("file.txt")
+        self.assertEqual(returnVal, False)
+        
 
-#         self.mockB.loadFile.assert_called_once_with("file.txt")
+    def test_parse_add_success(self):
+        finalData = [
+            Entry("data1", "1"),
+            Entry("data2", "2"),
+            Entry("data3", "3")
+        ]
 
-#         self.assertEqual(self.moduleA._data, None)
-#         self.assertEqual(returnVal, False)
+        returnVal = self.moduleA.parseAdd("data3", "3")
 
-#     def test_parse_add_success(self):
-#         returnData = [
-#             Entry("data1", "1"),
-#             Entry("data2", "2"),
-#             Entry("data3", "3")
-#         ]
+        self.mockF.displayData.assert_called_once_with(data=finalData)
+        self.mockG.updateData.assert_called_once_with(self.initialFile, finalData)
 
-#         self.mockD.insertData.return_value = returnData.copy()
+        self.assertEqual(self.moduleA._data, finalData) 
+        self.assertEqual(returnVal, True)   
 
-#         returnVal = self.moduleA.parseAdd("data3", "3")
+    def test_parse_add_fail(self):
+        self.moduleA._data = None
 
-#         self.mockD.insertData.assert_called_once_with(self.initialData, "data3", "3", self.initialFile)
+        returnVal = self.moduleA.parseAdd("data3", "3")
 
-#         self.assertEqual(self.moduleA._data, returnData)
-#         self.assertEqual(returnVal, True)   
+        self.assertEqual(self.moduleA._data, None)
+        self.assertEqual(returnVal, False) 
 
-#     def test_parse_add_fail(self):
-#         self.mockD.insertData.return_value = None
+    def test_run_sort_success(self):
+        self.moduleA._data = [
+            Entry("data3", "1"),
+            Entry("data2", "2"),
+            Entry("data1", "3")
+        ]
+        finalData = [
+            Entry("data1", "3"),
+            Entry("data2", "2"),
+            Entry("data3", "1")
+        ]
 
-#         returnVal = self.moduleA.parseAdd("data3", "3")
-#         self.mockD.insertData.assert_called_once_with(self.initialData, "data3", "3", self.initialFile)
+        returnVal = self.moduleA.runSort()
 
-#         self.assertEqual(self.moduleA._data, None)
-#         self.assertEqual(returnVal, False) 
+        self.mockF.displayData.assert_called_once_with(finalData)
 
-#     def test_run_sort_success(self):
-#         data = [
-#             Entry("data1", "1"),
-#             Entry("data2", "2"),
-#             Entry("data3", "3")
-#         ]
+        self.assertEqual(self.moduleA._data, finalData)
+        self.assertEqual(returnVal, True)  
 
-#         self.mockC.sortData.return_value = data.copy()
+    def test_run_sort_fail(self):
+        self.moduleA._data = None
 
-#         returnVal = self.moduleA.runSort()
+        returnVal = self.moduleA.runSort()
 
-#         self.mockC.sortData.assert_called_once_with(self.initialData)
-
-#         self.assertEqual(self.moduleA._data, data)
-#         self.assertEqual(returnVal, True)  
-
-#     def test_run_sort_fail(self):
-#         self.mockC.sortData.return_value = None
-
-#         returnVal = self.moduleA.runSort()
-
-#         self.mockC.sortData.assert_called_once_with(self.initialData)
+        self.assertEquals(returnVal, False)
+        self.assertEqual(self.moduleA._data, None)
 
 
-#         self.assertEqual(self.moduleA._data, None)
-#         self.assertEqual(returnVal, False) 
+    def test_parse_update_success(self):
+        finalData = [
+            Entry("data1", "1"),
+            Entry("data2", "2"),
+            Entry("data3", "3")
+        ]
 
-#     def test_parse_update_success(self):
-#         finalData = [
-#             Entry("data1", "1"),
-#             Entry("data2", "2"),
-#             Entry("data3", "3")
-#         ]
+        returnVal = self.moduleA.parseUpdate(2, "data3", "3")
 
-#         self.mockD.updateData.return_value = finalData.copy()
+        self.mockF.displayData.assert_called_once_with(finalData)
+        self.mockG.updateData.assert_called_once_with(self.initialFile, finalData)
 
-#         returnVal = self.moduleA.parseUpdate(2, "data3", "3")
+        self.assertEqual(self.moduleA._data, finalData)
+        self.assertEqual(returnVal, True)
 
-#         self.mockD.updateData.assert_called_once_with(self.initialData, 2, "data3", "3", self.initialFile)
+    def test_parse_update_fail(self):
+        self.moduleA._data = None
 
-#         self.assertEqual(self.moduleA._data, finalData)
-#         self.assertEqual(returnVal, True)
+        returnVal = self.moduleA.parseUpdate(2, "data3", "3")
 
-#     def test_parse_update_fail(self):
-#         self.mockD.updateData.return_value = None
+        self.assertEqual(self.moduleA._data, None)
+        self.assertEqual(returnVal, False)
 
-#         returnVal = self.moduleA.parseUpdate(2, "data3", "3")
+    @patch("builtins.print")
+    @patch("builtins.exit")
+    def test_run_exit(self, mockExit: MagicMock, mockPrint: MagicMock):
+        self.moduleA.runExit()
 
-#         self.mockD.updateData.assert_called_once_with(self.initialData, 2, "data3", "3", self.initialFile)
+        mockPrint.assert_called_once_with("Program Exit !")
+        mockExit.assert_called_once_with()
 
-#         self.assertEqual(self.moduleA._data, None)
-#         self.assertEqual(returnVal, False)
+    def test_data_getter(self):
+        returnVal = self.moduleA.data
 
-#     def test_run_exit(self):
-#         self.moduleA.runExit()
+        self.assertEqual(self.initialData, returnVal)
 
-#         self.mockE.exitProgram.assert_called_once_with()
+    def test_data_setter(self):
+        finalData = [Entry("data", "1")]
+        self.moduleA.data = [Entry("data", "1")]
 
-#     def test_data_getter(self):
-#         returnVal = self.moduleA.data
+        self.assertEqual(finalData, self.moduleA._data)
 
-#         self.assertEqual(self.initialData, returnVal)
+    @patch('builtins.print')
+    def test_run_no_args(self, mockPrint):
+        self.moduleA.run()
 
-#     def test_data_setter(self):
-#         newData = [
-#             Entry("data", "99")
-#         ] 
+        mockPrint.assert_called_with("No command passed!")
 
-#         self.moduleA.data = newData.copy()
+    @patch('builtins.print')
+    def test_run_help(self, mockPrint):
+        self.moduleA.run('help')
 
-#         self.assertEqual(newData, self.moduleA._data)
+        help = [
+            call("**********************************************************"),
+            call("Command args :"),
+            call("help"),
+            call("**********************************************************"),
+            call("Available Commands: \n" \
+               +"load <filepath>\n" \
+               +"add <name> <number>\n" \
+               +"update <index> <name> <number>\n" \
+               +"delete <index>\n" \
+               +"sort\n" \
+               +"exit")
+        ]
+        mockPrint.assert_has_calls(help)
 
-#     @patch('builtins.print')
-#     def test_run_no_args(self, mockPrint):
-#         self.moduleA.run()
+    @patch('builtins.print')
+    def test_run_load_no_args(self, mockPrint):
+        # Test without args
+        self.moduleA.run('load')
+        mockPrint.assert_called_with('Malformed command!')
 
-#         mockPrint.assert_called_with("No command passed!")
+    @patch('builtins.print')
+    @patch("builtins.open", new_callable=mock_open)
+    def test_run_load(self, mockOpen, mockPrint):
+        file = mockOpen.return_value
+        file.readlines.return_value = [
+            "data1,2\n",
+            "data2,4\n"
+        ]
 
-#     @patch('builtins.print')
-#     @patch('modules.ModuleA.ModuleA.displayHelp')
-#     def test_run_help(self, mockDisplayHelp, mockPrint):
-#         self.moduleA.run('help')
+        self.moduleA.run("load", "file.txt")
 
-#         mockDisplayHelp.assert_called_once_with()
-#         mockDisplayHelp.side
+        mockOpen.assert_called_once_with("file.txt")
+        # mockPrint.assert_called_once_with("Could not read file")
+        self.mockF.displayData.assert_called_once_with([
+            Entry("data1", "2"),
+            Entry("data2", "4")
+        ])
 
-#     @patch('builtins.print')
-#     def test_run_load_no_args(self, mockPrint):
-#         # Test without args
-#         self.moduleA.run('load')
-#         mockPrint.assert_called_with('Malformed command!')
+    @patch('builtins.print')
+    def test_run_add_no_args(self, mockPrint):
+        self.moduleA.run('add')
+        mockPrint.assert_called_with('Malformed command!')
 
-#     @patch('builtins.print')
-#     @patch('modules.ModuleA.ModuleA.parseLoad')
-#     def test_run_load(self, mockParseLoad, print):
-#         self.moduleA.run('load', 'file.txt')
+    @patch('builtins.print')
+    def test_run_add_no_data(self, mockPrint):
+        self.moduleA._data = None
+        self.moduleA.run('add', 'data23', '23')
 
-#         mockParseLoad.assert_called_once_with('file.txt')
+        mockPrint.assert_called_with("No file loaded!")
 
-#     @patch('builtins.print')
-#     def test_run_add_no_args(self, mockPrint):
-#         self.moduleA.run('add')
-#         mockPrint.assert_called_with('Malformed command!')
+    @patch('builtins.print')
+    def test_run_add(self, mockPrint):
+        finalData = [
+            *self.initialData,
+            Entry("data23", "23")
+        ]
 
-#     @patch('builtins.print')
-#     def test_run_add_no_data(self, mockPrint):
-#         self.moduleA._data = None
-#         self.moduleA.run('add', 'data23', '23')
+        self.moduleA.run('add', 'data23', '23')
 
-#         mockPrint.assert_called_with("No file loaded!")
+        self.mockF.displayData.assert_called_once_with(data=finalData)
 
-#     @patch('builtins.print')
-#     @patch('modules.ModuleA.ModuleA.parseAdd')
-#     def test_run_add(self, mockParseAdd, mockPrint):
-#         self.moduleA.run('add', 'data23', '23')
+        self.mockG.updateData(self.initialFile, finalData)
 
-#         mockParseAdd.assert_called_once_with('data23', '23')
+    @patch('builtins.print')
+    def test_run_sort_no_data(self, mockPrint):
+        self.moduleA._data = None
 
-#     @patch('builtins.print')
-#     def test_run_sort_no_data(self, mockPrint):
-#         self.moduleA._data = None
+        self.moduleA.run('sort')
 
-#         self.moduleA.run('sort')
+        mockPrint.assert_called_with('No file loaded!')
 
-#         mockPrint.assert_called_with('No file loaded!')
+    @patch('builtins.print')
+    def test_run_sort(self, mockPrint):
+        self.moduleA._data = [
+            Entry("data3", "3"),
+            Entry("data1", "1")
+        ]
+        finalData = [
+            Entry("data1", "1"),
+            Entry("data3", "3")
+        ]
 
-#     @patch('builtins.print')
-#     @patch('modules.ModuleA.ModuleA.runSort')
-#     def test_run_sort(self, mockRunSort, mockPrint):
-#         self.moduleA.run('sort')
+        self.moduleA.run('sort')
 
-#         mockRunSort.assert_called_once()
+        self.assertEquals(self.moduleA._data, finalData)
+        self.mockF.displayData(finalData)
 
-#     @patch('builtins.print')
-#     def test_run_update_no_args(self, mockPrint):
-#         self.moduleA.run('update')
+        
 
-#         mockPrint.assert_called_with("Malformed command!")
+    @patch('builtins.print')
+    def test_run_update_no_args(self, mockPrint):
+        self.moduleA.run('update')
 
-#     @patch('builtins.print')
-#     def test_run_update_no_data(self, mockPrint):
-#         self.moduleA._data = None
-#         self.moduleA.run('update', 3, "data33", "33")
+        mockPrint.assert_called_with("Malformed command!")
 
-#         mockPrint.assert_called_with("No file loaded!")
+    @patch('builtins.print')
+    def test_run_update_no_data(self, mockPrint):
+        self.moduleA._data = None
+        self.moduleA.run('update', 3, "data33", "33")
 
-#     @patch('builtins.print')
-#     @patch('modules.ModuleA.ModuleA.parseUpdate')
-#     def test_run_update(self, mockParseUpdate, mockPrint):
-#         self.moduleA.run('update', 3, 'data33', '33')
+        mockPrint.assert_called_with("No file loaded!")
 
-#         mockParseUpdate.assert_called_once_with( 3, 'data33', '33')
+    @patch('builtins.print')
+    def test_run_update(self, mockPrint):
+        finalData = [
+            Entry("data1", "1"),
+            Entry("data33", "33")
+        ]
+        self.moduleA.run('update', 1, 'data33', '33')
+
+        self.mockF.displayData.assert_called_once_with(finalData)
+        self.mockG.updateData.assert_called_once_with(self.initialFile, finalData)
     
-#     @patch('builtins.print')
-#     def test_run_delete_no_args(self, mockPrint):
-#         self.moduleA.run('delete')
+    @patch('builtins.print')
+    def test_run_delete_no_args(self, mockPrint):
+        self.moduleA.run('delete')
 
-#         mockPrint.assert_called_with('Malformed command!')
+        mockPrint.assert_called_with('Malformed command!')
 
-#     @patch('builtins.print')
-#     def test_run_delete_no_data(self, mockPrint):
-#         self.moduleA._data = None
-#         self.moduleA.run('delete', 3)
+    @patch('builtins.print')
+    def test_run_delete_no_data(self, mockPrint):
+        self.moduleA._data = None
+        self.moduleA.run('delete', 3)
 
-#         mockPrint.assert_called_with("No file loaded!")
+        mockPrint.assert_called_with("No file loaded!")
 
 #     @patch('builtins.print')
 #     @patch('modules.ModuleA.ModuleA.parseDelete')
