@@ -51,8 +51,6 @@ class TestModuleABCDE(unittest.TestCase):
         self.assertEqual(returnVal, True)
 
     def test_parse_delete_fail(self):
-        self.moduleA._data = [Entry("single", "1")]
-
         returnVal = self.moduleA.parseDelete(0)
 
         self.mockF.displayData.assert_called_once_with([])
