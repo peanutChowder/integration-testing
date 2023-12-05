@@ -92,7 +92,7 @@ class TestModuleABCDE(unittest.TestCase):
 
     @patch("builtins.open", side_effect=IOError())
     def test_parse_load_fail(self, mockOpen):
-        self.moduleA._data = []
+        self.moduleA._data = None
         returnVal = self.moduleA.parseLoad("file.txt")
 
         mockOpen.assert_called_with("file.txt")
