@@ -74,8 +74,7 @@ class TestModuleD(unittest.TestCase):
             "file.txt"
         )
 
-        for i in range(len(initialData)):
-            self.assertEqual(initialData[i], finalData[i])
+        self.assertEqual(initialData, finalData)
         
         mockPrint.assert_has_calls([
             call("Current Data:"),
