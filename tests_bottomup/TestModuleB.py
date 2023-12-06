@@ -26,8 +26,7 @@ class TestModuleB(unittest.TestCase):
 
         returnVal = self.moduleB.loadFile("file.txt")
 
-        for i in range(len(expectedData)):
-            self.assertEqual(returnVal[i], expectedData[i])
+        self.assertEqual(returnVal, expectedData)
 
         mockPrint.assert_has_calls([
             call("1 data1, 3"),
